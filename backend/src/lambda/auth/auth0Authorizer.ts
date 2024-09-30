@@ -4,7 +4,7 @@ import { createLogger } from '../../utils/logger.mjs'
 
 const logger = createLogger('auth')
 
-const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
+const jwksUrl = 'https://haumu199741.us.auth0.com/.well-known/jwks.json'
 
 export async function handler(event) {
   try {
@@ -50,7 +50,7 @@ async function verifyToken(authHeader) {
   return undefined;
 }
 
-function getToken(authHeader) {
+function getToken(authHeader: string): string {
   if (!authHeader) throw new Error('No authentication header')
 
   if (!authHeader.toLowerCase().startsWith('bearer '))
