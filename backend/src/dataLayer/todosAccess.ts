@@ -1,7 +1,7 @@
 import * as AWS from "aws-sdk";
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
-import { createLogger } from "../utils/logger";
+import { createLogger } from '../utils/logger';
 
 
 const logger = createLogger("TodoAccess");
@@ -60,7 +60,7 @@ export class TodosAccess {
               ":dueDate": updatedTodo.dueDate,
               ":done": updatedTodo.done
           },
-          ReturnValues: "UPDATED_NEW"
+          ReturnValues: 'updateTodo'
         })
         .promise();
       return { Updated: updatedsTodo };

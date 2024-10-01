@@ -1,13 +1,18 @@
-const s3_bucket_name19 = process.env.ATTACHMENT_S3_BUCKET;
+import * as AWS from 'aws-sdk'
+import * as AWSXRay from 'aws-xray-sdk'
+import { CreateSignedURLRequest } from '../requests/CreateSignedURLRequest';
 
 
-export class AttachmentUtils {
-  constructor(
-    private readonly bucket_name = s3_bucket_name19
-  ) {}
+const XAWS = AWSXRay.captureAWS(AWS)
 
-  createAttachmentPresignedUrl(todoId: string): string {
-    return "https://" + this.bucket_name + ".s3.amazoneaws.com/" + todoId;
-  }
+export class TodosStorage {
+    constructor(
+        private readonly s3Bucket = new XAWS.S3({ signatureVersion: 'v3'})
+    ) {}
 
+
+    getPresignedUploadURL(createSignedUrlRequest: CreateSignedURLRequest) {
+      const get= this.s3Bucket.getSignedUrl('putObject', createSignedUrlRequest);
+        return get;
+    }
 }

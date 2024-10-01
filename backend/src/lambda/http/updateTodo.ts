@@ -2,34 +2,21 @@ import 'source-map-support/register';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as middy from 'middy';
 import { cors, httpErrorHandler } from 'middy/middlewares';
-import { UpdateTodo } from '../../businessLogic/todos';
-import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest';
+import { updateTodo } from '../../businessLogic/todos';
+
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    try {
-    } catch (error) {
-      return {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Credentials': true,
-        },
-        statusCode: 500,
-        body: JSON.stringify({ error: error }),
-      };
-    }
-    const updatedTodo: UpdateTodoRequest = JSON.parse(event.body);
-    await UpdateTodo(event);
+    const updatedToDo = await updateTodo(event);
     return {
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true
       },
-      statusCode: 204,
-      body: JSON.stringify({ item: updatedTodo }),
+      statusCode: 200,
+      body: JSON.stringify({msg: "The image has been updated", updated: updatedToDo})
     };
-  }
-);
+  })
 
 handler.use(httpErrorHandler()).use(
   cors({
