@@ -7,7 +7,7 @@ const XAWS = AWSXRay.captureAWS(AWS)
 
 export class TodosStorage {
     constructor(
-        private readonly s3Bucket = new XAWS.S3({ signatureVersion: 'v3'})
+        private readonly s3Bucket = new XAWS.S3({ signatureVersion: 'v4'})
     ) {}
 
 
