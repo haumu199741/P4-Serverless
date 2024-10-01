@@ -127,8 +127,9 @@ export function Todos() {
   useEffect(() => {
     async function foo() {
       try {
+       
         const accessToken = await getAccessTokenSilently({
-          audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN}/api/v2/`,
+          audience: `https://haumu199741.us.auth0.com/api/v2/`,
           scope: 'read:todos'
         })
         const todos = await getTodos(accessToken)

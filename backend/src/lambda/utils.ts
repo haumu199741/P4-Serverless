@@ -1,4 +1,4 @@
-import { parseUserId } from '../auth/utils.ts'
+import { parseUserId } from '../auth/utils'
 
 export function getUserId(event) {
   const authorization = event.headers.Authorization

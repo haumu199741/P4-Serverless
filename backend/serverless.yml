@@ -1,6 +1,7 @@
-org: uda19
+org: haumu199741
 app: uda19
-service: serverless-todo-app-v1
+service: aws-node-express-dynamodb-api-project
+frameworkVersion: '3'
 
 plugins:
   - serverless-webpack
@@ -11,7 +12,7 @@ provider:
   name: aws
   runtime: nodejs16.x
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-west-2'}
+  region: ${opt:region, 'us-east-1'}
   profile: default
   environment:
     TODOS_TABLE: todo-app-${self:provider.stage}
@@ -23,20 +24,18 @@ provider:
   tracing:
     lambda: true
     apiGateway: true  
-
-
-
-logs:
-  restApi: true
-
-iam:
+  logs:
+    restApi: true
+    websocket: true
+    httpApi: true
+  iam:
     role:
       statements:
-        - Effect: Allow
-          Action:
-            - xray:PutTelemetryRecords
-            - xray:PutTraceSegments
-          Resource: "*"  
+      - Effect: Allow
+        Action:
+          - xray:PutTelemetryRecords
+          - xray:PutTraceSegments
+        Resource: "*"  
 
 functions:
 
@@ -77,7 +76,7 @@ functions:
           cors: true
           request:
             schemas:
-              application/json: ${file(models/create-todo-model.json)}
+              application/json: ${file(model/create-todo-model.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -99,7 +98,7 @@ functions:
           cors: true
           request:
             schemas:
-              application/json: ${file(models/update-todo-model.json)}
+              application/json: ${file(model/update-todo-model.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -114,7 +113,7 @@ functions:
       - http:
           method: delete
           path: todos/{todoId}
-           cors: true
+          cors: true
           authorizer: Auth
     iamRoleStatements:
       - Effect: Allow
@@ -137,17 +136,13 @@ functions:
           path: todos/{todoId}/attachment
           cors: true
           authorizer: Auth
+    iamRoleStatementsName: hlr119      
     iamRoleStatements:
       - Effect: Allow
         Action:
           - s3:PutObject
           - s3:GetObject
         Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*
-      - Effect: Allow
-        Action:
-          - xray:PutTraceSegments
-        Resource:
-          - "*"  
 
 resources:
   Resources:

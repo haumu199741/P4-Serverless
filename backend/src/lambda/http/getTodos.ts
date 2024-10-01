@@ -20,8 +20,7 @@ export const handler = middy(
         body: JSON.stringify({ error: error }),
       };
     } 
-    const userId = getUserId(event);
-    const todos = await getTodosForUser(userId);
+    const todos = await getTodosForUser(getUserId(event));
     return {
       statusCode: 200,
       body: JSON.stringify({ items: todos }),

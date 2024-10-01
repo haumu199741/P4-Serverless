@@ -1,18 +1,24 @@
 import * as AWS from "aws-sdk";
-import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
 import { createLogger } from "../utils/logger";
 
 
 const logger = createLogger("TodoAccess");
+const s3_bucket_name = process.env.ATTACHMENT_S3_BUCKET;
+const sAWS = require("aws-xray-sdk").captureAWS(AWS);
+const url_expiration = process.env.SIGNED_URL_EXPIRATION;
+
 
 export class TodosAccess {
 
     constructor(
-        private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
+        private readonly docClient = new AWS.DynamoDB.DocumentClient(),
         private readonly todosTable = process.env.TODOS_TABLE,
         private readonly todosIndex = process.env.TODOS_CREATED_AT_INDEX,
+        private readonly S3 = new sAWS.S3({ signatureVersion: "v4" }),
+        private readonly bucket_name = s3_bucket_name
+        
     ) {
     }
 
@@ -47,7 +53,7 @@ export class TodosAccess {
         const updatedsTodo = await this.docClient.update({
             TableName: this.todosTable,
             Key: { userId, todoId },
-            ExpressionAttributeNames: { "#N": "name"; "#done" },
+            ExpressionAttributeNames: { "#N": "name"},
             UpdateExpression: "set #N=:todoName, dueDate=:dueDate, done=:done",
             ExpressionAttributeValues: {
               ":todoName": updatedTodo.name,
@@ -73,6 +79,29 @@ export class TodosAccess {
         return result.Item;
     }
 
+    async getUploadUrl(todoId: string, userId: string): Promise<string> {
+        const uploadUrl = this.S3.getSignedUrl("putObject", {
+          Bucket: this.bucket_name,
+          Key: todoId,
+          Expires: Number(url_expiration),
+        });
+        await this.docClient
+          .update({
+            TableName: this.todosTable,
+            Key: {
+              userId,
+              todoId,
+            },
+            UpdateExpression: "set attachmentUrl = :URL",
+            ExpressionAttributeValues: {
+              ":URL": uploadUrl.split("?")[0],
+            },
+            ReturnValues: "UPDATED_NEW",
+          })
+          .promise();
+        return uploadUrl;
+      }
+    
     async deleteToDo(todoId: string, userId: string) {
         logger.info('deleteToDo');
         await this.docClient.delete({

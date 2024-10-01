@@ -10,27 +10,18 @@ export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const newTodo: CreateTodoRequest = JSON.parse(event.body);
     const userId = getUserId(event);
-    try {
-    } catch (error) {
-      return {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Credentials': true,
-        },
-        statusCode: 500,
-        body: JSON.stringify({ Error: error }),
-      };
-    }const newItem = await createTodo(newTodo, userId);
+    const newItem = await createTodo(newTodo, userId);
     return {
+      statusCode: 201,
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
+          "Access-Control-Allow-Origin": "*",
+          'Access-Control-Allow-Credentials': true,
       },
-      statusCode: 200,
       body: JSON.stringify({
-        item: newItem,
+          "item": newItem
       }),
-    };
+    }
+  }
 );
 
 handler.use(
