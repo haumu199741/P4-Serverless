@@ -80,6 +80,7 @@ export function Todos() {
         audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN}/api/v2/`,
         scope: 'delete:todo'
       })
+      console.log('value: ', todoId)
       await deleteTodo(accessToken, todoId)
       setTodos(todos.filter((todo) => todo.todoId !== todoId))
     } catch (e) {
@@ -104,7 +105,7 @@ export function Todos() {
           [pos]: { done: { $set: !todo.done } }
         })
       )
-    } catch (e) {
+    } catch (e) { 
       console.log('Failed to check a TODO', e)
       alert('Todo deletion failed')
     }
@@ -129,7 +130,7 @@ export function Todos() {
       try {
        
         const accessToken = await getAccessTokenSilently({
-          audience: `https://haumu199741.us.auth0.com/api/v2/`,
+          audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN}/api/v2/`,
           scope: 'read:todos'
         })
         const todos = await getTodos(accessToken)
