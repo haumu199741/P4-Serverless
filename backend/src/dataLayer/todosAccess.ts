@@ -48,22 +48,30 @@ export class TodosAccess {
         return todo as TodoItem;
     }
 
-    async updateTodo(userId: string, todoId: string, updatedTodo: TodoUpdate) {
-        logger.info('updateTodo');
-        const updatedsTodo = await this.docClient.update({
+    async update(userId: string, todoId: string, todoUpdate: TodoUpdate): Promise<TodoItem> {
+      logger.info(`Updating todo item ${todoId} in ${this.todosTable}`);
+      try {
+        await this.docClient.update({
             TableName: this.todosTable,
-            Key: { userId, todoId },
-            ExpressionAttributeNames: { "#N": "name"},
-            UpdateExpression: "set #N=:todoName, dueDate=:dueDate, done=:done",
+            Key: {
+              userId,
+              todoId,
+            },
+            UpdateExpression:"set #N = :name, #dueDate = :dueDate, #done = :done",
+            ExpressionAttributeNames: {"#N": "name","#dueDate": "dueDate","#done": "done"},
             ExpressionAttributeValues: {
-              ":todoName": updatedTodo.name,
-              ":dueDate": updatedTodo.dueDate,
-              ":done": updatedTodo.done
-          },
-          ReturnValues: 'updateTodo'
-        })
-        .promise();
-      return { Updated: updatedsTodo };
+              ":name": todoUpdate.name,
+              ":dueDate": todoUpdate.dueDate,
+              ":done": todoUpdate.done,
+            },
+            ReturnValues: "UPDATED_NEW",
+          })
+          .promise();
+      } catch (error) {
+        logger.error("Error update Todo.", error.response ? error.response.data : error.message);
+        throw Error(error);
+      }
+      return todoUpdate as TodoItem;
     }
 
     async getTodoFromDB(todoId: string, userId: string) {

@@ -36,12 +36,12 @@ export async function createTodo(
   return todoItem;
 }
 
-export async function updateTodo(event: APIGatewayProxyEvent) {
+export async function UpdateTodo(event: APIGatewayProxyEvent) {
   logger.info('UpdateTodo');
   const todoId = event.pathParameters.todoId
   const userId = getUserId(event)
   const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
-  return await todosAccess.updateTodo(userId, todoId, updatedTodo)
+  return await todosAccess.update(userId, todoId, updatedTodo)
 
 }
 

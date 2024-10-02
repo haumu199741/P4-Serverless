@@ -2,12 +2,12 @@ import 'source-map-support/register';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as middy from 'middy';
 import { cors, httpErrorHandler } from 'middy/middlewares';
-import { updateTodo } from '../../businessLogic/todos';
+import { UpdateTodo } from '../../businessLogic/todos';
 
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const updatedToDo = await updateTodo(event);
+    const updatedToDo = await UpdateTodo(event);
     return {
       headers: {
         "Access-Control-Allow-Origin": "*",
